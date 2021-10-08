@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Ergonode\ImporterVerto\Infrastructure\Processor;
 
-use Ergonode\ImporterVerto\Domain\Entity\VertoCsvSource;
-use Ergonode\ImporterVerto\Infrastructure\Model\ProductModel;
-use Ergonode\ImporterVerto\Infrastructure\Model\VariableProductModel;
-use Ergonode\ImporterVerto\Infrastructure\Reader\VertoProductReader;
 use Ergonode\Core\Domain\ValueObject\Language;
 use Ergonode\Core\Domain\ValueObject\TranslatableString;
 use Ergonode\Designer\Domain\Repository\TemplateRepositoryInterface;
@@ -15,6 +11,10 @@ use Ergonode\Importer\Domain\Entity\Import;
 use Ergonode\Importer\Domain\Repository\SourceRepositoryInterface;
 use Ergonode\Importer\Infrastructure\Exception\ImportException;
 use Ergonode\Importer\Infrastructure\Processor\SourceImportProcessorInterface;
+use Ergonode\ImporterVerto\Domain\Entity\VertoCsvSource;
+use Ergonode\ImporterVerto\Infrastructure\Model\ProductModel;
+use Ergonode\ImporterVerto\Infrastructure\Model\VariableProductModel;
+use Ergonode\ImporterVerto\Infrastructure\Reader\VertoProductReader;
 use Ergonode\Product\Domain\Entity\VariableProduct;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -66,8 +66,8 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
                 $step->process($import, $product, $source);
             }
 
-            $childSku = $product->getSku();
-            $variableProducts[$childSku] = $this->getVariableProduct($product, $variableProducts[$childSku] ?? null);
+            $parentSku = $this->getParentSku($product);
+            $variableProducts[$parentSku] = $this->getVariableProduct($product, $variableProducts[$parentSku] ?? null);
         }
 
         foreach ($variableProducts as $product) {
@@ -77,6 +77,12 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
         }
     }
 
+    /**
+     * @param ProductModel $childProduct
+     * @param VariableProductModel|null $variableProductModel
+     * @return VariableProductModel
+     * @throws ImportException
+     */
     private function getVariableProduct(
         ProductModel $childProduct,
         ?VariableProductModel $variableProductModel = null
@@ -88,34 +94,47 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
             return $variableProductModel;
         }
 
-        $parentIdentifier = $childProduct->getAttributes()[VariableProductModel::IDENTIFYING_ATTRIBUTE] ?? null;
-        if ($parentIdentifier instanceof TranslatableString) {
-            $sku = $parentIdentifier->get(new Language(VertoProductReader::DEFAULT_LANGUAGE));
-
-            $templateAttribute = $childProduct->getAttributes()[VertoProductReader::TEMPLATE_ATTRIBUTE];
-            if (!$templateAttribute
-                || !$templateCode = $templateAttribute->get(
-                    new Language(VertoProductReader::DEFAULT_LANGUAGE)
-                )) {
-                throw new ImportException(
-                    'Missing template attribute for product {productId}',
-                    ['{productId}' => $childSku]
-                );
-            }
-
-            return new VariableProductModel(
-                $sku,
-                VariableProduct::TYPE,
-                $templateCode,
-                VertoProductReader::BINDING_ATTRIBUTE,
-                $childProduct->getAttributes(),
-                $childSku
+        $templateAttribute = $childProduct->getAttributes()[VertoProductReader::TEMPLATE_ATTRIBUTE];
+        if (!$templateAttribute
+            || !$templateCode = $templateAttribute->get(
+                new Language(VertoProductReader::DEFAULT_LANGUAGE)
+            )) {
+            throw new ImportException(
+                'Missing template attribute for product {productId}',
+                ['{productId}' => $childSku]
             );
         }
 
+        $parentSku = $this->getParentSku($childProduct);
+
+        return new VariableProductModel(
+            $parentSku,
+            VariableProduct::TYPE,
+            $templateCode,
+            VertoProductReader::BINDING_ATTRIBUTE,
+            $childProduct->getAttributes(),
+            $childSku
+        );
+    }
+
+    /**
+     * @param ProductModel $product
+     * @return string
+     * @throws ImportException
+     */
+    private function getParentSku(ProductModel $product): string
+    {
+        $parentIdentifier = $product->getAttributes()[VariableProductModel::IDENTIFYING_ATTRIBUTE] ?? null;
+        if ($parentIdentifier instanceof TranslatableString) {
+            $sku = $parentIdentifier->get(new Language(VertoProductReader::DEFAULT_LANGUAGE));
+            if ($sku) {
+                return $sku;
+            }
+        }
+
         throw new ImportException(
-            'Missing template attribute for product {productId}',
-            ['{productId}' => $childSku]
+            'Missing attribute {attribute} for product {productId}',
+            ['{attribute}' => VariableProductModel::IDENTIFYING_ATTRIBUTE, '{productId}' => $product->getSku()]
         );
     }
 }
