@@ -1,0 +1,36 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Ergonode\ImporterVerto\Application\:
+        resource: '../../Application/*'
+
+    Ergonode\ImporterVerto\Domain\:
+        resource: '../../Domain/*'
+        exclude: '../../Domain/{Entity}'
+
+    Ergonode\ImporterVerto\Infrastructure\:
+        resource: '../../Infrastructure/*'
+
+    Ergonode\ImporterVerto\Infrastructure\Handler\:
+        resource: '../../Infrastructure/Handler/*'
+        tags: ['messenger.message_handler']
+
+    Ergonode\ImporterVerto\Infrastructure\Resolver\ProductCommandResolver:
+        arguments:
+            - !tagged_iterator 'component.verto-importer.product_command_factory_interface'
+
+    Ergonode\ImporterVerto\Infrastructure\Processor\VertoImportProcess:
+        arguments:
+            $steps:
+                - 'Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoOptionsProcessorStep'
+                - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoSimpleProductProcessorStep'
+                - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoVariableProductProcessorStep'
+                - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoMarkMissingTemplateElementStep'
+
+
+    Ergonode\ImporterVerto\Infrastructure\Reader\VertoProductReader:
+        arguments:
+            $directory: '%import_directory%'

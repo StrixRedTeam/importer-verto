@@ -1,0 +1,44 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Ergonode\Designer\Application\:
+        resource: '../../Application/*'
+
+    Ergonode\Designer\Infrastructure\:
+        resource: '../../Infrastructure/*'
+        exclude: '../../Infrastructure/{Message}'
+
+    Ergonode\Designer\Domain\:
+        resource: '../../Domain/*'
+        exclude: '../../Domain/{Entity, ValueObject}'
+
+    Ergonode\Designer\Application\Controller\:
+        resource: '../../Application/Controller/*'
+        tags: ['controller.service_arguments']
+
+    Ergonode\Designer\Infrastructure\Handler\:
+        resource: '../../Infrastructure/Handler/*'
+        tags: ['messenger.message_handler']
+
+    Ergonode\Designer\Infrastructure\Persistence\Projector\:
+        resource: '../../Infrastructure/Persistence/Projector/*'
+        tags: ['ergonode.event_sourcing.projector']
+
+    Ergonode\Designer\Domain\Repository\TemplateRepositoryInterface: '@Ergonode\Designer\Infrastructure\Persistence\Repository\EventStoreTemplateRepository'
+    Ergonode\Designer\Domain\Repository\TemplateGroupRepositoryInterface: '@Ergonode\Designer\Infrastructure\Persistence\Repository\EventStoreTemplateGroupRepository'
+    Ergonode\Designer\Domain\Query\TemplateElementGridQueryInterface: '@Ergonode\Designer\Infrastructure\Persistence\Query\DbalTemplateElementGridQuery'
+    Ergonode\Designer\Domain\Query\TemplateQueryInterface: '@Ergonode\Designer\Infrastructure\Persistence\Query\DbalTemplateQuery'
+    Ergonode\Designer\Domain\Query\TemplateGroupQueryInterface: '@Ergonode\Designer\Infrastructure\Persistence\Query\DbalTemplateGroupQuery'
+
+    Ergonode\Designer\Infrastructure\Grid\AttributeGridBuilderDecorator:
+        decorates: 'Ergonode\Attribute\Infrastructure\Grid\AttributeGridBuilder'
+        arguments:
+            $builder: '@Ergonode\Designer\Infrastructure\Grid\AttributeGridBuilderDecorator.inner'
+
+    Ergonode\Designer\Infrastructure\Persistence\Query\AttributeGridQueryDecorator:
+        decorates: 'Ergonode\Attribute\Domain\Query\AttributeGridQueryInterface'
+        arguments:
+            $query: '@Ergonode\Designer\Infrastructure\Persistence\Query\AttributeGridQueryDecorator.inner'

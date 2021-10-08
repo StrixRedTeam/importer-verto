@@ -1,0 +1,14 @@
+ergonode_import_api:
+    resource: '../../Application/Controller/Api/Import/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_import_notification:
+    resource: '../../Application/Controller/Api/Notification/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_source_api:
+    resource: '../../Application/Controller/Api/Source/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'

@@ -1,0 +1,115 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Ergonode\Core\Application\:
+        resource: '../../Application/*'
+
+    Ergonode\Core\Domain\:
+        resource: '../../Domain/*'
+        exclude: '../../Domain/{Entity, ValueObject}'
+
+    Ergonode\Core\Application\Controller\:
+        resource: '../../Application/Controller'
+        tags: ['controller.service_arguments']
+
+    Ergonode\Core\Infrastructure\:
+        resource: '../../Infrastructure/*'
+
+    Ergonode\Core\Infrastructure\Handler\:
+        resource: '../../Infrastructure/Handler/*'
+        tags: ['messenger.message_handler']
+
+    Ergonode\Core\Infrastructure\Persistence\Projector\:
+        resource: '../../Infrastructure/Persistence/Projector/*'
+        tags: ['messenger.message_handler']
+
+    Ergonode\Core\Application\Provider\SimpleDirectoryProvider:
+        arguments:
+            $directory: '%kernel.project_dir%'
+
+    Ergonode\Core\Application\Form\Extension\:
+        resource: '../../Application/Form/Extension/*'
+        tags: ['liform.extension']
+
+    Ergonode\Core\Domain\Query\LanguageQueryInterface: '@Ergonode\Core\Infrastructure\Persistence\Query\DbalLanguageQuery'
+    Ergonode\Core\Domain\Query\UnitQueryInterface: '@Ergonode\Core\Infrastructure\Persistence\Query\DbalUnitQuery'
+    Ergonode\Core\Domain\Repository\LanguageRepositoryInterface: '@Ergonode\Core\Infrastructure\Persistence\Repository\DbalLanguageRepository'
+    Ergonode\Core\Domain\Repository\UnitRepositoryInterface: '@Ergonode\Core\Infrastructure\Persistence\Repository\EventStoreUnitRepository'
+    Ergonode\Core\Application\Provider\DirectoryProviderInterface: '@Ergonode\Core\Application\Provider\SimpleDirectoryProvider'
+    Ergonode\Core\Infrastructure\Resolver\RelationshipsResolverInterface: '@Ergonode\Core\Infrastructure\Resolver\RelationshipsResolver'
+    Ergonode\Core\Domain\Query\Builder\DefaultLabelQueryBuilderInterface: '@Ergonode\Core\Infrastructure\Persistence\Query\Builder\DbalDefaultLabelQueryBuilder'
+    Ergonode\Core\Domain\Query\Builder\DefaultImageQueryBuilderInterface: '@Ergonode\Core\Infrastructure\Persistence\Query\Builder\DbalDefaultImageQueryBuilder'
+
+    # overriding message serializer
+    messenger.transport.serializer:
+        class: 'Ergonode\Core\Infrastructure\Transport\Serializer\TransportMessageSerializer'
+
+    Ergonode\Core\Infrastructure\Service\DownloaderInterface: '@Ergonode\Core\Infrastructure\Service\CurlDownloader'
+    Ergonode\Core\Infrastructure\Service\Decorator\CacheDownloaderDecorator:
+        decorates: Ergonode\Core\Infrastructure\Service\DownloaderInterface
+        arguments:
+            - '@Ergonode\Core\Infrastructure\Service\Decorator\CacheDownloaderDecorator.inner'
+
+    Ergonode\Core\Application\Messenger\DomainEventBus:
+        arguments:
+            $eventBus: '@domain.event.bus'
+
+    Ergonode\Core\Application\Messenger\ApplicationEventBus:
+        arguments:
+            $eventBus: '@application.event.bus'
+
+    Ergonode\SharedKernel\Domain\Bus\DomainEventBusInterface: '@Ergonode\Core\Application\Messenger\DomainEventBus'
+    Ergonode\SharedKernel\Domain\Bus\ApplicationEventBusInterface: '@Ergonode\Core\Application\Messenger\ApplicationEventBus'
+
+    Ergonode\SharedKernel\Domain\Bus\CommandBusInterface: '@Ergonode\Core\Application\Messenger\CommandBus'
+    Ergonode\Core\Application\Messenger\CommandBus:
+        arguments:
+            $syncBus: '@messenger.bus.sync'
+            $asyncBus: '@messenger.bus.async'
+            $asyncEnable: '%ergonode.core.use_async_bus%'
+
+    Ergonode\SharedKernel\Application\Serializer\SerializerInterface: '@Ergonode\Core\Application\Serializer\SymfonySerializer'
+    Ergonode\SharedKernel\Application\Serializer\NormalizerInterface: '@Ergonode\Core\Application\Serializer\SymfonySerializer'
+
+    Ergonode\Core\Application\Serializer\Normalizer\EntityNormalizer:
+        arguments:
+            $normalizer: '@Ergonode\Core\Application\Serializer\Normalizer\ObjectPropertyNormalizer'
+        tags:
+            - { name: 'serializer.normalizer', priority: -100 }
+
+    Ergonode\Core\Application\Serializer\Normalizer\AggregateRootNormalizer:
+        arguments:
+            $normalizer: '@Ergonode\Core\Application\Serializer\Normalizer\ObjectPropertyNormalizer'
+        tags:
+            - {name: 'serializer.normalizer', priority: -100}
+
+    Ergonode\Core\Application\Serializer\Normalizer\ObjectPropertyNormalizer:
+        arguments:
+            - '@serializer.mapping.class_discriminator_resolver'
+            - '@serializer.mapping.class_metadata_factory'
+            - '@serializer.name_converter.metadata_aware'
+            - '@property_info'
+        tags:
+            - {name: 'serializer.normalizer', priority: -999}
+
+    Ergonode\Core\Application\Serializer\Normalizer\ScalarValueObjectNormalizer:
+        tags:
+            - { name: 'serializer.normalizer', priority: -990 }
+
+    Ergonode\Core\Application\Serializer\SymfonySerializer:
+        $serializer: '@serializer'
+
+    Ergonode\Core\Application\Serializer\Normalizer\AssocArrayDenormalizer:
+        $supportedTypes:
+            - Ergonode\SharedKernel\Domain\Aggregate\AttributeGroupId
+            - Ergonode\Core\Domain\ValueObject\LanguagePrivileges
+            - Ergonode\ProductCollection\Domain\Entity\ProductCollectionElement
+            - Ergonode\SharedKernel\Domain\Aggregate\StatusId
+            - Ergonode\Workflow\Domain\Entity\Transition
+            - Ergonode\Value\Domain\ValueObject\ValueInterface
+            - Ergonode\SharedKernel\Domain\Aggregate\AttributeId
+            - Ergonode\Core\Domain\ValueObject\Language
+            - Ergonode\Core\Domain\ValueObject\TranslatableString

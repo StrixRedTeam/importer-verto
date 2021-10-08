@@ -1,0 +1,40 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Ergonode\Category\Application\:
+        resource: '../../Application/*'
+        exclude: '../../Domain/{Model}'
+
+    Ergonode\Category\Domain\:
+        resource: '../../Domain/*'
+        exclude: '../../Domain/{Entity,ValueObject}'
+
+    Ergonode\Category\Infrastructure\:
+        resource: '../../Infrastructure/*'
+        exclude: '../../Infrastructure/{Message}'
+
+    Ergonode\Category\Application\Controller\:
+        resource: '../../Application/Controller'
+        tags: ['controller.service_arguments']
+
+    Ergonode\Category\Infrastructure\Handler\:
+        resource: '../../Infrastructure/Handler/*'
+        tags: ['messenger.message_handler']
+
+    Ergonode\Category\Infrastructure\Persistence\:
+        resource: '../../Infrastructure/Persistence/*'
+
+    Ergonode\Category\Infrastructure\Persistence\Projector\:
+        resource: '../../Infrastructure/Persistence/Projector/*'
+        tags: ['ergonode.event_sourcing.projector']
+
+    Ergonode\Category\Domain\Entity\Category:
+        autowire: true
+
+    Ergonode\Category\Domain\Repository\CategoryRepositoryInterface: '@Ergonode\Category\Infrastructure\Persistence\Repository\EventStoreCategoryRepository'
+    Ergonode\Category\Domain\Query\CategoryQueryInterface: '@Ergonode\Category\Infrastructure\Persistence\Query\DbalCategoryQuery'
+    Ergonode\Category\Domain\Repository\TreeRepositoryInterface: '@Ergonode\Category\Infrastructure\Persistence\Repository\EventStoreTreeRepository'
+    Ergonode\Category\Domain\Query\TreeQueryInterface: '@Ergonode\Category\Infrastructure\Persistence\Query\DbalTreeQuery'

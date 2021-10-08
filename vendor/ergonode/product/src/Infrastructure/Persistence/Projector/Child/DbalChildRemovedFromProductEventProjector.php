@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Copyright © Bold Brand Commerce Sp. z o.o. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+
+declare(strict_types=1);
+
+namespace Ergonode\Product\Infrastructure\Persistence\Projector\Child;
+
+use Doctrine\DBAL\DBALException;
+use Ergonode\Product\Domain\Event\Relation\ChildRemovedFromProductEvent;
+use Ergonode\Product\Infrastructure\Persistence\Projector\AbstractProductProjector;
+
+class DbalChildRemovedFromProductEventProjector extends AbstractProductProjector
+{
+    private const TABLE = 'product_children';
+
+    /**
+     * @throws DBALException
+     */
+    public function __invoke(ChildRemovedFromProductEvent $event): void
+    {
+        $this->connection->delete(
+            self::TABLE,
+            [
+                'product_id' => $event->getAggregateId()->getValue(),
+                'child_id' => $event->getChildId()->getValue(),
+            ]
+        );
+
+        $this->updateAudit($event->getAggregateId());
+    }
+}

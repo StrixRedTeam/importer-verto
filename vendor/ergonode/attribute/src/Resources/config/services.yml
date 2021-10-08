@@ -1,0 +1,59 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Ergonode\Attribute\Application\:
+        resource: '../../Application/*'
+
+    Ergonode\Attribute\Application\Controller\:
+        resource: '../../Application/Controller'
+        tags: ['controller.service_arguments']
+
+    Ergonode\Attribute\Domain\:
+        resource: '../../Domain/*'
+        exclude: '../../Domain/{ValueObject,Type}'
+
+    Ergonode\Attribute\Infrastructure\:
+        resource: '../../Infrastructure/*'
+        exclude: '../../Infrastructure/{Handler}'
+
+    Ergonode\Attribute\Infrastructure\Handler\:
+        resource: '../../Infrastructure/Handler/*'
+        tags: ['messenger.message_handler']
+
+    Ergonode\Attribute\Infrastructure\Persistence\Projector\:
+        resource: '../../Infrastructure/Persistence/Projector/*'
+        tags: [ 'ergonode.event_sourcing.projector' ]
+
+    Ergonode\Attribute\Infrastructure\Mapper\Strategy\:
+        resource: '../../Infrastructure/Mapper/Strategy/*'
+        tags: [ 'attribute.attribute_mapper_strategy' ]
+
+    Ergonode\Attribute\Domain\Repository\AttributeRepositoryInterface: '@Ergonode\Attribute\Infrastructure\Persistence\Repository\EventStoreAttributeRepository'
+    Ergonode\Attribute\Domain\Repository\AttributeGroupRepositoryInterface: '@Ergonode\Attribute\Infrastructure\Persistence\Repository\EventStoreAttributeGroupRepository'
+
+    Ergonode\Attribute\Domain\Query\AttributeQueryInterface: '@Ergonode\Attribute\Infrastructure\Persistence\Query\DbalAttributeQuery'
+
+    Ergonode\Attribute\Domain\Query\AttributeGroupQueryInterface: '@Ergonode\Attribute\Infrastructure\Persistence\Query\DbalAttributeGroupQuery'
+    Ergonode\Attribute\Domain\Query\AttributeGridQueryInterface: '@Ergonode\Attribute\Infrastructure\Persistence\Query\DbalAttributeGridQuery'
+    Ergonode\Attribute\Domain\Query\CurrencyQueryInterface: '@Ergonode\Attribute\Infrastructure\Persistence\Query\DbalCurrencyQuery'
+
+    Ergonode\Attribute\Infrastructure\Mapper\AttributeValueMapper:
+        arguments:
+            $strategies: !tagged_iterator 'attribute.attribute_mapper_strategy'
+
+    Ergonode\Attribute\Application\Controller\Api\Attribute\SystemAttributeGridReadAction:
+        tags: ['controller.service_arguments']
+        arguments:
+             $gridBuilder: '@Ergonode\Attribute\Infrastructure\Grid\AttributeGridBuilder'
+
+    Ergonode\Attribute\Application\Controller\Api\Attribute\AttributeGridReadAction:
+        tags: ['controller.service_arguments']
+        arguments:
+            $gridBuilder: '@Ergonode\Attribute\Infrastructure\Grid\AttributeGridBuilder'
+
+    Ergonode\Attribute\Application\Serializer\Normalizer\AttributeNormalizer:
+        tags:
+            - {name: 'serializer.normalizer', priority: -10}

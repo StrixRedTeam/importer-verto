@@ -1,0 +1,51 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Ergonode\Workflow\Application\:
+        resource: '../../Application/*'
+        exclude: '../../Domain/{Model}'
+
+    Ergonode\Workflow\Domain\:
+        resource: '../../Domain/*'
+        exclude: '../../Domain/{Entity, ValueObject, Event}'
+
+    Ergonode\Workflow\Infrastructure\:
+        resource: '../../Infrastructure/*'
+        exclude: '../../Infrastructure/{Message}'
+
+    Ergonode\Workflow\Application\Controller\:
+        resource: '../../Application/Controller'
+        tags: ['controller.service_arguments']
+
+    Ergonode\Workflow\Infrastructure\Handler\:
+        resource: '../../Infrastructure/Handler/*'
+        tags: ['messenger.message_handler']
+
+    Ergonode\Workflow\Infrastructure\Persistence\Projector\:
+        resource: '../../Infrastructure/Persistence/Projector/*'
+        tags: ['ergonode.event_sourcing.projector']
+
+    Ergonode\Workflow\Domain\Repository\StatusRepositoryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Repository\EventStoreStatusRepository'
+    Ergonode\Workflow\Domain\Repository\WorkflowRepositoryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Repository\EventStoreWorkflowRepository'
+
+    Ergonode\Workflow\Domain\Query\StatusQueryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Query\DbalStatusQuery'
+    Ergonode\Workflow\Domain\Query\StatusGridQueryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Query\DbalStatusGridQuery'
+    Ergonode\Workflow\Domain\Query\TransitionGridQueryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Query\DbalTransitionGridQuery'
+    Ergonode\Workflow\Domain\Query\TransitionQueryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Query\DbalTransitionQuery'
+    Ergonode\Workflow\Domain\Query\TransitionConditionSetQueryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Query\DbalTransitionQuery'
+    Ergonode\Workflow\Domain\Query\WorkflowQueryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Query\DbalWorkflowQuery'
+    Ergonode\Workflow\Domain\Query\ProductWorkflowStatusQueryInterface: '@Ergonode\Workflow\Infrastructure\Persistence\Query\DbalProductWorkflowStatusQuery'
+
+    Ergonode\Workflow\Application\Request\ParamConverter\AbstractWorkflowParamConverter:
+        class: Ergonode\Workflow\Application\Request\ParamConverter\AbstractWorkflowParamConverter
+        tags:
+            - { name: request.param_converter, priority: 2, converter: abstract_workflow_param_converter }
+
+    Ergonode\Workflow\Domain\Factory\AddStatusToProductFactoryDecorator:
+        decorates: Ergonode\Product\Domain\Factory\ProductFactoryInterface
+        arguments:
+            - '@Ergonode\Workflow\Domain\Factory\AddStatusToProductFactoryDecorator.inner'
+

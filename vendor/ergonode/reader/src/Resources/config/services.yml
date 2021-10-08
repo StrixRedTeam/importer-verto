@@ -1,0 +1,18 @@
+services:
+    _defaults:
+            autowire: true
+            autoconfigure: true
+            public: false
+
+    Ergonode\Reader\Application\:
+        resource: '../../Application/*'
+
+    Ergonode\Reader\Infrastructure\:
+        resource: '../../Infrastructure/*'
+
+    Ergonode\Reader\Infrastructure\Provider\ReaderProcessorProvider:
+        calls:
+            - method: setReader
+              arguments:
+                - 'csv'
+                - '@Ergonode\Reader\Infrastructure\Processor\CsvReaderProcessor'

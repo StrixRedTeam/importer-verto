@@ -1,0 +1,34 @@
+ergonode_product_api:
+    resource: '../../Application/Controller/Api/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_product_relations_api:
+    resource: '../../Application/Controller/Api/Relations/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_product_batch_action_api:
+    resource: '../../Application/Controller/Api/BatchAction/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_product_binding_api:
+    resource: '../../Application/Controller/Api/Bindings/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_product_category_api:
+    resource: '../../Application/Controller/Api/Category/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_product_dashboard_api:
+    resource: '../../Application/Controller/Api/Dashboard/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_attribute_dashboard_api:
+    resource: '../../Application/Controller/Api/Attribute/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'

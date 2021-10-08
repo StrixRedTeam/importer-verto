@@ -1,0 +1,63 @@
+parameters:
+    import_directory: '%kernel.project_dir%/import/'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Ergonode\Importer\Application\:
+        resource: '../../Application/*'
+
+#    Ergonode\Importer\Application\Command\:
+#        resource: '../../Application/Command/*'
+#        tags: ['console.command']
+
+    Ergonode\Importer\Application\Controller\Api\:
+        resource: '../../Application/Controller/Api/*'
+        tags: ['controller.service_arguments']
+
+    Ergonode\Importer\Domain\:
+        resource: '../../Domain/*'
+        exclude: '../../Domain/{Entity,ValueObject}'
+
+    Ergonode\Importer\Infrastructure\:
+        resource: '../../Infrastructure/*'
+
+    Ergonode\Importer\Infrastructure\Handler\:
+        resource: '../../Infrastructure/Handler/*'
+        tags: ['messenger.message_handler']
+
+
+    Ergonode\Importer\Domain\Repository\ImportRepositoryInterface: '@Ergonode\Importer\Infrastructure\Persistence\Repository\DbalImportRepository'
+
+    Ergonode\Importer\Domain\Query\ImportQueryInterface: '@Ergonode\Importer\Infrastructure\Persistence\Query\DbalImportQuery'
+    Ergonode\Importer\Domain\Query\ImportGridQueryInterface: '@Ergonode\Importer\Infrastructure\Persistence\Query\DbalImportGridQuery'
+    Ergonode\Importer\Domain\Query\ImportErrorGridQueryInterface: '@Ergonode\Importer\Infrastructure\Persistence\Query\DbalImportErrorGridQuery'
+    Ergonode\Importer\Domain\Query\SourceGridQueryInterface: '@Ergonode\Importer\Infrastructure\Persistence\Query\DbalSourceGridQuery'
+
+    Ergonode\Importer\Application\Service\Upload\UploadService:
+        arguments:
+            $targetDirectory: '%import_directory%'
+
+    Ergonode\Importer\Infrastructure\Action\Process\Product\ImportProductAttributeBuilder:
+        arguments:
+            $strategies: !tagged_iterator ergonode.importer.attribute_strategy
+
+    Ergonode\Importer\Infrastructure\Handler\Import\DeleteImportCommandHandler:
+        tags: [ { name: 'messenger.message_handler', priority: -10 }]
+
+    Ergonode\Importer\Infrastructure\Action\Process\Template\TemplateElementBuilderProvider:
+        arguments:
+            -
+                - '@Ergonode\Importer\Infrastructure\Action\Process\Template\Strategy\AttributeTemplateElementBuilderStrategy'
+                - '@Ergonode\Importer\Infrastructure\Action\Process\Template\Strategy\LabelTemplateElementBuilderStrategy'
+
+    Ergonode\Importer\Infrastructure\Validator\AttributeImportValidator:
+        arguments:
+            $strategies: !tagged_iterator ergonode.importer.attribute_validator
+
+    Ergonode\Importer\Infrastructure\Resolver\AttributeImportResolver:
+        arguments:
+            $strategies: !tagged_iterator ergonode.importer.attribute_resolver

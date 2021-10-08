@@ -1,0 +1,23 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Ergonode\Notification\Application\:
+        resource: '../../Application/*'
+
+    Ergonode\Notification\Infrastructure\:
+        resource: '../../Infrastructure/*'
+        exclude: '../../Infrastructure/{Message}'
+
+    Ergonode\Notification\Application\Controller\:
+        resource: '../../Application/Controller/*'
+        tags: ['controller.service_arguments']
+
+    Ergonode\Notification\Infrastructure\Handler\:
+        resource: '../../Infrastructure/Handler/*'
+        tags: ['messenger.message_handler']
+
+    Ergonode\Notification\Domain\Query\NotificationQueryInterface: '@Ergonode\Notification\Infrastructure\Persistence\Query\DbalNotificationQuery'
+    Ergonode\Notification\Domain\Query\NotificationGridQueryInterface: '@Ergonode\Notification\Infrastructure\Persistence\Query\DbalNotificationGridQuery'

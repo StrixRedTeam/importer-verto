@@ -1,0 +1,17 @@
+TEXT: Text
+NUMERIC: Numeric
+TEXT_AREA: Textarea
+DATE: Date
+SELECT: Select
+MULTI_SELECT: Multi select
+IMAGE: Image
+GALLERY: Gallery
+COMPLEX: Complex
+PRICE: Price
+UNIT: Unit
+FILE: File
+Basic: Basic data
+Data: Attribute data
+History: History
+Multilingual: Multilingual
+Attributes: Attributes

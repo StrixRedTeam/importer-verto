@@ -1,0 +1,83 @@
+<?php
+/**
+ * Copyright © Bold Brand Commerce Sp. z o.o. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+
+declare(strict_types=1);
+
+namespace Ergonode\ImporterVerto\Domain\Entity;
+
+use Ergonode\Importer\Domain\Entity\Source\AbstractSource;
+use Ergonode\SharedKernel\Domain\Aggregate\SourceId;
+use Webmozart\Assert\Assert;
+
+class VertoCsvSource extends AbstractSource
+{
+    public const TYPE = 'verto-csv';
+
+    public const DELIMITER = ',';
+    public const ENCLOSURE = '"';
+    public const ESCAPE = '\\';
+
+    public const PRODUCTS = 'products';
+
+    public const STEPS = [
+        self::PRODUCTS,
+    ];
+
+    private array $import;
+
+    public function __construct(
+        SourceId $id,
+        string $name,
+        array $imports = []
+    ) {
+        parent::__construct($id, $name);
+        Assert::allString($imports);
+
+        $this->import = [];
+        foreach ($imports as $import) {
+            $this->import[] = $import;
+        }
+    }
+
+    public function getType(): string
+    {
+        return self::TYPE;
+    }
+
+    public function getDelimiter(): string
+    {
+        return self::DELIMITER;
+    }
+
+    public function getEnclosure(): string
+    {
+        return self::ENCLOSURE;
+    }
+
+    public function getEscape(): string
+    {
+        return self::ESCAPE;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setImport(array $import): void
+    {
+        $this->import = $import;
+    }
+
+    public function import(string $step): bool
+    {
+        if (array_key_exists($step, array_flip($this->import))) {
+            return true;
+        }
+
+        return false;
+    }
+}

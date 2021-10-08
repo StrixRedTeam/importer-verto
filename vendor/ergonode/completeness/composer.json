@@ -1,0 +1,43 @@
+{
+    "name": "ergonode/completeness",
+    "type": "ergonode-module",
+    "description": "Ergonode - completeness",
+    "homepage": "https://ergonode.com",
+    "license": "OSL-3.0",
+    "config": {
+        "bin-dir": "bin",
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "require": {
+        "php": "^7.4",
+        "doctrine/dbal": "^2.13",
+        "ergonode/attribute": "^1.1.0",
+        "ergonode/core": "^1.1.0",
+        "ergonode/designer": "^1.1.0",
+        "ergonode/shared-kernel": "^1.1.0",
+        "nelmio/api-doc-bundle": "^3.6",
+        "ramsey/uuid": "^3.8",
+        "sensio/framework-extra-bundle": "^5.5",
+        "symfony/form": "^4.4.11",
+        "symfony/messenger": "^4.4",
+        "symfony/translation": "^4.4",
+        "symfony/validator": "^4.4.11",
+        "vich/uploader-bundle": "^1.10"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ergonode\\Completeness\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ergonode\\Completeness\\Tests\\": "tests/"
+        }
+    }
+}

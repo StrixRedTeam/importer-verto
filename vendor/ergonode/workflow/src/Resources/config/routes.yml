@@ -1,0 +1,24 @@
+ergonode_workflow_dashboard_api:
+    resource: '../../Application/Controller/Api/Dashboard/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}/'
+
+ergonode_workflow_api:
+    resource: '../../Application/Controller/Api/Workflow/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}/'
+
+ergonode_transition_api:
+    resource: '../../Application/Controller/Api/Transition/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_status_api:
+    resource: '../../Application/Controller/Api/Status/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'
+
+ergonode_product_workflow:
+    resource: '../../Application/Controller/Api/Product/*'
+    type: 'annotation'
+    prefix: '/api/v1/{language}'

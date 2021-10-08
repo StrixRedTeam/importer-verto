@@ -1,0 +1,59 @@
+nelmio_api_doc:
+    documentation:
+        batch_action_definitions:
+            batch-action:
+                type: object
+                properties:
+                    type:
+                        type: string
+                        required: true
+                        description: type
+                        example: product_delete
+                    filter:
+                        type: object
+                        required: false
+                        description: filter
+                        properties:
+                            ids:
+                                type: object
+                                required: false
+                                description: list id
+                                properties:
+                                    list:
+                                        type: array
+                                        required: true
+                                        items:
+                                            type: string
+                                    included:
+                                        type: bool
+                                        required: true
+                            query:
+                                type: string
+                                required: false
+                                description: Filter grid query
+                    payload:
+                        type: object
+                        required: false
+                        description: payload
+            batch-action-filter:
+                type: object
+                required: false
+                description: filter
+                properties:
+                    ids:
+                        type: object
+                        required: false
+                        description: list id
+                        properties:
+                            list:
+                                type: array
+                                required: true
+                                items:
+                                    type: string
+                            included:
+                                type: boolean
+                                required: true
+                    query:
+                        type: string
+                        required: false
+                        description: Filter grid query

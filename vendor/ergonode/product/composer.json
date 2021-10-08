@@ -1,0 +1,48 @@
+{
+    "name": "ergonode/product",
+    "type": "ergonode-module",
+    "description": "Ergonode - Product",
+    "homepage": "https://ergonode.com",
+    "license": "OSL-3.0",
+    "config": {
+        "bin-dir": "bin",
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "require": {
+        "php": "^7.4",
+        "doctrine/dbal": "^2.13",
+        "ergonode/api": "^1.1.0",
+        "ergonode/batch-action": "^1.1.0",
+        "ergonode/category": "^1.1.0",
+        "ergonode/core": "^1.1.0",
+        "ergonode/es": "^1.1.0",
+        "ergonode/grid": "^1.1.0",
+        "ergonode/migration": "^1.1.0",
+        "ergonode/shared-kernel": "^1.1.0",
+        "ergonode/workflow": "^1.1.0",
+        "ergonode/value": "^1.1.0",
+        "nelmio/api-doc-bundle": "^3.6",
+        "ramsey/uuid": "^3.8",
+        "sensio/framework-extra-bundle": "^5.5",
+        "symfony/form": "^4.4.11",
+        "symfony/messenger": "^4.4",
+        "symfony/translation": "^4.4",
+        "symfony/validator": "^4.4.11"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ergonode\\Product\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ergonode\\Product\\Tests\\": "tests/"
+        }
+    }
+}
