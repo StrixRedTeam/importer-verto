@@ -25,7 +25,7 @@ services:
     Ergonode\ImporterVerto\Infrastructure\Processor\VertoImportProcess:
         arguments:
             $steps:
-                - 'Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoOptionsProcessorStep'
+                - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoOptionsProcessorStep'
                 - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoSimpleProductProcessorStep'
                 - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoVariableProductProcessorStep'
                 - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoMarkMissingTemplateElementStep'
