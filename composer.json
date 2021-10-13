@@ -2,8 +2,6 @@
   "name": "ergonode/importer-verto",
   "type": "ergonode-module",
   "description": "Ergonode - Importer Verto",
-  "homepage": "https://ergonode.com",
-  "license": "OSL-3.0",
   "config": {
     "bin-dir": "bin",
     "preferred-install": {
