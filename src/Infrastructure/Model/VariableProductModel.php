@@ -6,7 +6,7 @@ namespace Ergonode\ImporterVerto\Infrastructure\Model;
 class VariableProductModel extends ProductModel
 {
     public const IDENTIFYING_ATTRIBUTE = 'modelokolor';
-    protected const UNIQUE_ATTRIBUTES = ['idarticle', 'index','ean_code'];
+    protected const UNIQUE_ATTRIBUTES = ['idarticle', 'index','ean_code', 'rozmiar'];
 
     protected string $bindingAttribute;
 
