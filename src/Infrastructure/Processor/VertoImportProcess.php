@@ -16,6 +16,9 @@ use Ergonode\ImporterVerto\Infrastructure\Model\ProductModel;
 use Ergonode\ImporterVerto\Infrastructure\Model\VariableProductModel;
 use Ergonode\ImporterVerto\Infrastructure\Reader\VertoProductReader;
 use Ergonode\Product\Domain\Entity\VariableProduct;
+use Ergonode\Product\Domain\Query\ProductQueryInterface;
+use Ergonode\Product\Domain\Repository\ProductRepositoryInterface;
+use Ergonode\Product\Domain\ValueObject\Sku;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Webmozart\Assert\Assert;
@@ -28,6 +31,10 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
 
     protected TemplateRepositoryInterface $templateRepository;
 
+    protected ProductRepositoryInterface $productRepository;
+
+    protected ProductQueryInterface $productQuery;
+
     private SourceRepositoryInterface $repository;
 
     /**
@@ -39,13 +46,17 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
         array $steps,
         SourceRepositoryInterface $repository,
         VertoProductReader $reader,
-        TemplateRepositoryInterface $templateRepository
+        TemplateRepositoryInterface $templateRepository,
+        ProductRepositoryInterface $productRepository,
+        ProductQueryInterface $productQuery
     ) {
         Assert::allIsInstanceOf($steps, VertoProcessorStepInterface::class);
         $this->steps = $steps;
         $this->repository = $repository;
         $this->reader = $reader;
         $this->templateRepository = $templateRepository;
+        $this->productRepository = $productRepository;
+        $this->productQuery = $productQuery;
     }
 
     public function supported(string $type): bool
@@ -62,8 +73,11 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
         $this->reader->open($import->getFile());
         $variableProducts = [];
         while ($product = $this->reader->read()) {
+
+            $productWithMergedData = $this->mergeExistingAttributes($product);
+
             foreach ($this->steps as $step) {
-                $step->process($import, $product, $source);
+                $step->process($import, $productWithMergedData, $source);
             }
 
             $parentSku = $this->getParentSku($product);
@@ -107,7 +121,7 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
 
         $parentSku = $this->getParentSku($childProduct);
 
-        return new VariableProductModel(
+        $variableProductModel = new VariableProductModel(
             $parentSku,
             VariableProduct::TYPE,
             $templateCode,
@@ -115,6 +129,10 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
             $childProduct->getAttributes(),
             $childSku
         );
+
+        $variableProductModel = $this->mergeExistingAttributes($variableProductModel);
+
+        return $variableProductModel;
     }
 
     /**
@@ -136,5 +154,27 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
             'Missing attribute {attribute} for product {productId}',
             ['{attribute}' => VariableProductModel::IDENTIFYING_ATTRIBUTE, '{productId}' => $product->getSku()]
         );
+    }
+
+    private function mergeExistingAttributes(ProductModel $product): ProductModel
+    {
+        $productId = $this->productQuery->findProductIdBySku(new Sku($product->getSku()));
+        if (!$productId) {
+            return $product;
+        }
+
+        $productEntity = $this->productRepository->load($productId);
+        if (!$productEntity) {
+            return $product;
+        }
+
+        $existingAttributes = $productEntity->getAttributes();
+        foreach ($existingAttributes as $code => $value) {
+            if (!$product->hasAttribute($code)) {
+                $product->addFullAttribute($code, $value);
+            }
+        }
+
+        return $product;
     }
 }

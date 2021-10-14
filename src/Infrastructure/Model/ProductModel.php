@@ -14,8 +14,11 @@ use Ergonode\Core\Domain\ValueObject\TranslatableString;
 class ProductModel extends AbstractModel
 {
     protected string $sku;
+
     protected string $type;
+
     protected string $template;
+
     protected array $attributes = [];
 
     /**
@@ -63,15 +66,27 @@ class ProductModel extends AbstractModel
     }
 
     /**
+     * @param string $code
+     * @param mixed $attributeValue
+     *
+     * @return void
+     *
+     */
+    public function addFullAttribute(string $code, $attributeValue): void
+    {
+        $this->attributes[$code] = $attributeValue;
+    }
+
+    public function hasAttribute(string $code): bool
+    {
+        return isset($this->attributes[$code]);
+    }
+
+    /**
      * @return string[]
      */
     public function getCategories(): array
     {
         return $this->categories;
-    }
-
-    public function addCategory(string $code): void
-    {
-        $this->categories[$code] = $code;
     }
 }
