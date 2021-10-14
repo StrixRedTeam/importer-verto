@@ -28,7 +28,7 @@ services:
                 - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoOptionsProcessorStep'
                 - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoSimpleProductProcessorStep'
                 - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoVariableProductProcessorStep'
-                - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoMarkMissingTemplateElementStep'
+#                - '@Ergonode\ImporterVerto\Infrastructure\Processor\Step\VertoMarkMissingTemplateElementStep'
 
 
     Ergonode\ImporterVerto\Infrastructure\Reader\VertoProductReader:
