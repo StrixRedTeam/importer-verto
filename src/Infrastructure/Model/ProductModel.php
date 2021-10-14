@@ -21,6 +21,8 @@ class ProductModel extends AbstractModel
 
     protected array $attributes = [];
 
+    protected array $existingAttributes = [];
+
     /**
      * @var string[]
      */
@@ -72,9 +74,9 @@ class ProductModel extends AbstractModel
      * @return void
      *
      */
-    public function addFullAttribute(string $code, $attributeValue): void
+    public function addExistingAttribute(string $code, $attributeValue): void
     {
-        $this->attributes[$code] = $attributeValue;
+        $this->existingAttributes[$code] = $attributeValue;
     }
 
     public function hasAttribute(string $code): bool
@@ -88,5 +90,15 @@ class ProductModel extends AbstractModel
     public function getCategories(): array
     {
         return $this->categories;
+    }
+
+    public function getExistingAttributes(): array
+    {
+        return $this->existingAttributes;
+    }
+
+    public function addFullAttribute(string $code, $attributeValue): void
+    {
+        $this->attributes[$code] = $attributeValue;
     }
 }

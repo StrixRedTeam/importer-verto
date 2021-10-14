@@ -38,6 +38,13 @@ class VertoSimpleProductProcessorStep implements VertoProcessorStepInterface
             return;
         }
 
+        $existingAttributes = $product->getExistingAttributes();
+        foreach ($existingAttributes as $code => $value) {
+            if (!$product->hasAttribute($code)) {
+                $product->addFullAttribute($code, $value);
+            }
+        }
+
         $id = ImportLineId::generate();
         $command = $this->commandResolver->resolve($id, $import, $product);
         $this->importRepository->addLine($id, $import->getId(), 'PRODUCT');

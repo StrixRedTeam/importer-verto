@@ -171,7 +171,7 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
         $existingAttributes = $productEntity->getAttributes();
         foreach ($existingAttributes as $code => $value) {
             if (!$product->hasAttribute($code)) {
-                $product->addFullAttribute($code, $value);
+                $product->addExistingAttribute($code, $value);
             }
         }
 
