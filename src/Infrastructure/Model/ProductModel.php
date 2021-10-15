@@ -21,8 +21,6 @@ class ProductModel extends AbstractModel
 
     protected array $attributes = [];
 
-    protected array $existingAttributes = [];
-
     /**
      * @var string[]
      */
@@ -67,18 +65,6 @@ class ProductModel extends AbstractModel
         $this->attributes[$code] = $this->attributes[$code]->add(new Language($language), $value);
     }
 
-    /**
-     * @param string $code
-     * @param mixed $attributeValue
-     *
-     * @return void
-     *
-     */
-    public function addExistingAttribute(string $code, $attributeValue): void
-    {
-        $this->existingAttributes[$code] = $attributeValue;
-    }
-
     public function hasAttribute(string $code): bool
     {
         return isset($this->attributes[$code]);
@@ -90,15 +76,5 @@ class ProductModel extends AbstractModel
     public function getCategories(): array
     {
         return $this->categories;
-    }
-
-    public function getExistingAttributes(): array
-    {
-        return $this->existingAttributes;
-    }
-
-    public function addFullAttribute(string $code, $attributeValue): void
-    {
-        $this->attributes[$code] = $attributeValue;
     }
 }

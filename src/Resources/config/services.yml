@@ -34,3 +34,9 @@ services:
     Ergonode\ImporterVerto\Infrastructure\Reader\VertoProductReader:
         arguments:
             $directory: '%import_directory%'
+
+    Ergonode\Importer\Infrastructure\Action\SimpleProductImportAction:
+        class: Ergonode\ImporterVerto\Infrastructure\Action\SimpleProductImportActionDecorator
+
+    Ergonode\Importer\Infrastructure\Action\VariableProductImportAction:
+        class: Ergonode\ImporterVerto\Infrastructure\Action\VariableProductImportActionDecorator
