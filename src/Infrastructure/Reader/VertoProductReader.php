@@ -10,6 +10,7 @@ class VertoProductReader extends AbstractVertoReader
 {
     public const DEFAULT_LANGUAGE = 'pl_PL';
     public const TEMPLATE_ATTRIBUTE = 'kat_2';
+    public const SIMPLE_PRODUCT_TEMPLATE = 'Produkty proste';
     public const BINDING_ATTRIBUTE = 'rozmiar';
     public const IDENTIFYING_ATTRIBUTE = 'ean_code';
 
@@ -29,7 +30,7 @@ class VertoProductReader extends AbstractVertoReader
                 $item = new ProductModel(
                     $record[self::IDENTIFYING_ATTRIBUTE],
                     SimpleProduct::TYPE,
-                    $record[self::TEMPLATE_ATTRIBUTE]
+                    self::SIMPLE_PRODUCT_TEMPLATE
                 );
             } elseif ($item->getSku() !== $record[self::IDENTIFYING_ATTRIBUTE]) {
                 break;
