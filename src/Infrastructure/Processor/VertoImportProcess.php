@@ -95,8 +95,11 @@ class VertoImportProcess implements SourceImportProcessorInterface, LoggerAwareI
                 new Language(VertoProductReader::DEFAULT_LANGUAGE)
             )) {
             throw new ImportException(
-                'Missing template attribute for product {productId}',
-                ['{productId}' => $childSku]
+                sprintf(
+                    'Missing %s attribute for product %s',
+                    VertoProductReader::TEMPLATE_ATTRIBUTE,
+                    $childSku
+                )
             );
         }
 

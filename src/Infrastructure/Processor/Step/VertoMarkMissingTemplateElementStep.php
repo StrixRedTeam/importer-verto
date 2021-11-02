@@ -60,16 +60,22 @@ class VertoMarkMissingTemplateElementStep implements VertoProcessorStepInterface
                 new Language(VertoProductReader::DEFAULT_LANGUAGE)
             )) {
             throw new ImportException(
-                'Missing template attribute for product {productId}',
-                ['{productId}' => $product->getSku()]
+                sprintf(
+                    'Missing %s attribute for product %s',
+                    VertoProductReader::TEMPLATE_ATTRIBUTE,
+                    $product->getSku()
+                )
             );
         }
 
         $templateId = $this->templateQuery->findTemplateIdByCode($templateCode);
         if (!$templateId || !$template = $this->templateRepository->load($templateId)) {
             throw new ImportException(
-                'Missing template attribute for product {productId}',
-                ['{productId}' => $product->getSku()]
+                sprintf(
+                    'Missing %s attribute for product %s',
+                    VertoProductReader::TEMPLATE_ATTRIBUTE,
+                    $product->getSku()
+                )
             );
         }
 
